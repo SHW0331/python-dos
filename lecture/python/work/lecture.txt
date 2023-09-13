@@ -1,0 +1,62 @@
+CREATE TABLE members
+(
+    name VARCHAR2(20),
+    id VARCHAR2(20),
+    pw VARCHAR2(20),
+    addr VARCHAR2(20),
+    hobby VARCHAR2(20),
+    age NUMBER(10)
+);
+
+SELECT * FROM members;
+
+INSERT INTO members
+(
+    name, 
+    id, 
+    pw, 
+    addr, 
+    hobby, 
+    age
+) 
+VALUES
+(
+    '홍길동',
+    'hong',
+    '1234',
+    'chosun',
+    'game',
+    25
+);
+
+SELECT * FROM members;  
+
+
+
+
+insert into members (name, id, pw, addr, hobby, age) values ('멍멍일', 'dog1', 'dog1123', '부산', 'hacker', 22);
+insert into members (name, id, pw, addr, hobby, age) values ('멍멍이', 'dog2', 'dog2123', '대전', 'baseball', 21);
+insert into members (name, id, pw, addr, hobby, age) values ('멍멍삼', 'dog3', 'dog3123', '대구', 'soccer', 27);
+insert into members (name, id, pw, addr, hobby, age) values ('멍멍사', 'dog4', 'dog4123', '대구', 'soccer', 29);
+insert into members (name, id, pw, addr, hobby, age) values ('멍멍오', 'dog5', 'dog5123', '대전', 'soccer', 24);
+insert into members (name, id, pw, addr, hobby, age) values ('야옹일', 'cat1', 'cat1123', '부산', 'baseball', 24);
+insert into members (name, id, pw, addr, hobby, age) values ('야옹이', 'cat2', 'cat2123', '부산', 'soccer', 22);
+insert into members (name, id, pw, addr, hobby, age) values ('야옹삼', 'cat3', 'cat3123', '제주', 'hacker', 21);
+insert into members (name, id, pw, addr, hobby, age) values ('야옹사', 'cat4', 'cat4123', '서울', 'soccer', 25);
+insert into members (name, id, pw, addr, hobby, age) values ('야옹오', 'cat5', 'cat5123', '서울', 'hacker', 22);
+
+SELECT * FROM members;
+
+
+DELETE FROM members WHERE name = '홍길동';
+
+SELECT * FROM members;
+
+SELECT * FROM members WHERE name like '멍멍%' or  addr = '부산';
+
+
+SELECT * FROM members WHERE name like '%야옹%' AND addr='서울' AND age>=21;
+
+
+
+
